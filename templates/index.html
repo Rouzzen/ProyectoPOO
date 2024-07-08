@@ -4,44 +4,25 @@
 <div class="container">
   <h1 class="title">Puestos activos</h1>
   <div class="row">
-    <div class="card" onclick="showPopup('Puesto galletas', '$800')">
-      <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Puesto de galletas">
-      <p>Puesto galletas</p>
-      <p>$800</p>
+    {% for puesto in puestos_activos %}
+    <div class="card" onclick="showPopup('{{ puesto.titulo }}', '${{ puesto.precio }}')">
+      <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
+      <p>{{ puesto.titulo }}</p>
+      <p>${{ puesto.precio }}</p>
     </div>
-    <div class="card" onclick="showPopup('Puesto dulces', '$1500')">
-      <img src="https://images.unsplash.com/photo-1565299627301-5204d177c700?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=722&q=80" alt="Puesto de dulces">
-      <p>Puesto dulces</p>
-      <p>$1500</p>
-    </div>
-    <div class="card" onclick="showPopup('Puesto Alfajores', '$500')">
-      <img src="https://images.unsplash.com/photo-1565299627301-5204d177c700?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=722&q=80" alt="Puesto de alfajores">
-      <p>Puesto Alfajores</p>
-      <p>$500</p>
-    </div>
+    {% endfor %}
   </div>
 
   <h1 class="title">Puestos inactivos</h1>
   <div class="row">
-    <div class="card inactive" onclick="showPopup('Puesto galletas', 'Inactivo')">
-      <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Puesto de galletas">
-      <p>Puesto galletas</p>
+    {% for puesto in puestos_inactivos %}
+    <div class="card inactive" onclick="showPopup('{{ puesto.titulo }}', 'Inactivo')">
+      <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
+      <p>{{ puesto.titulo }}</p>
+      <p>Inactivo</p>
     </div>
+    {% endfor %}
   </div>
-
-  <h2>Agregar nuevo puesto</h2>
-  <form onsubmit="addPuesto(event)">
-    <label for="title">Título:</label>
-    <input type="text" id="title" name="title" required>
-    <br>
-    <label for="price">Precio:</label>
-    <input type="text" id="price" name="price" required>
-    <br>
-    <label for="image_url">URL de la imagen:</label>
-    <input type="url" id="image_url" name="image_url" required>
-    <br>
-    <button type="submit" class="button">Agregar Puesto</button>
-  </form>
 </div>
 
 <!-- The Modal -->

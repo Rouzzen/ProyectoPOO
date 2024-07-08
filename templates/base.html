@@ -123,27 +123,6 @@
         popup.style.display = "none";
       }
     }
-
-    function addPuesto(event) {
-      event.preventDefault();
-      var title = document.getElementById('title').value;
-      var price = document.getElementById('price').value;
-      var imageUrl = document.getElementById('image_url').value;
-
-      var newCard = `
-        <div class="card" onclick="showPopup('${title}', '${price}')">
-          <img src="${imageUrl}" alt="${title}">
-          <p>${title}</p>
-          <p>${price}</p>
-        </div>
-      `;
-
-      document.querySelector('.row').insertAdjacentHTML('beforeend', newCard);
-
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image_url').value = '';
-    }
   </script>
 </body>
 </html>

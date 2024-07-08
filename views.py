@@ -5,7 +5,16 @@ views = Blueprint("views", __name__)
 
 @views.route("/")
 def home():
-    return render_template("index.html")
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM puesto WHERE estado = 'activo'")
+    puestos_activos = cur.fetchall()
+
+    cur.execute("SELECT * FROM puesto WHERE estado = 'inactivo'")
+    puestos_inactivos = cur.fetchall()
+
+    cur.close()
+
+    return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos)
 
 @views.route('/add', methods=['POST'])
 def add_puesto():
@@ -55,3 +64,31 @@ def logout():
     session.pop('user_id', None)
     session.pop('username', None)
     return redirect(url_for('views.home'))
+
+@views.route("/puesto", methods=['GET', 'POST'])
+def agregar_puesto():
+    if request.method == 'POST':
+        if 'username' in session:
+            usuario_id = session['user_id'] 
+            titulo = request.form['titulo']
+            productos = request.form['productos']
+            ofertas = request.form.get('ofertas', '') 
+            estado = 'inactivo'  
+            
+            
+            if 'imagen' in request.files:
+                imagen = request.files['imagen']
+                
+            
+            
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO puesto (id, titulo, productos, ofertas, estado) VALUES (%s, %s, %s, %s, %s)",
+                        (usuario_id, titulo, productos, ofertas, estado))
+            mysql.connection.commit()
+            cur.close()
+            
+            return "Puesto creado correctamente."
+        else:
+            return "Debe iniciar sesión para crear un puesto."
+    
+    return render_template("puesto.html")
