@@ -1,0 +1,12 @@
+<html>
+    <nav>
+        <a href="{{ url_for('views.home') }}">Inicio</a>
+        {% if 'username' in session %}
+          <span>Bienvenido, {{ session['username'] }}!</span>
+          <a href="{{ url_for('views.logout') }}">Cerrar sesión</a>
+        {% else %}
+          <a href="{{ url_for('views.login') }}">Iniciar sesión</a>
+          <a href="{{ url_for('views.usuario') }}">Crear cuenta</a>
+        {% endif %}
+      </nav>
+</html>

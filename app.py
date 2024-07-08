@@ -1,8 +1,10 @@
 from flask import Flask
 from views import views
+import os
 from db import mysql
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"

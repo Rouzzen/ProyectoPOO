@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import mysql  # Importa mysql desde db.py
 
 views = Blueprint("views", __name__)
@@ -14,7 +14,7 @@ def add_puesto():
     image_url = request.form.get('image_url')
     return render_template('index.html', title=title, price=price, image_url=image_url)
 
-@views.route("/usuario", methods=['GET','POST'])
+@views.route("/usuario", methods=['GET', 'POST'])
 def usuario():
     if request.method == 'POST':
         user = request.form['user']
@@ -29,3 +29,29 @@ def usuario():
         cur.close()
         return "success"
     return render_template("usuario.html")
+
+@views.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session.pop('user', None)
+        
+        username = request.form['username']
+        password = request.form['clave']
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM usuario WHERE usuario = %s AND clave = %s', (username, password))
+        user = cursor.fetchone()
+        
+        if user:
+            session['user_id'] = user[0]
+            session['username'] = user[1]
+            return redirect(url_for('views.home'))
+        
+        return 'Usuario o clave incorrecta', 401
+    
+    return render_template("login.html")
+@views.route("/logout")
+def logout():
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return redirect(url_for('views.home'))

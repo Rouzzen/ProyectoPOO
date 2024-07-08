@@ -6,6 +6,26 @@
     body {
       font-family: sans-serif;
     }
+    nav {
+      border-bottom: 1px solid gray;
+      padding: 10px 0;
+      text-align: center;
+    }
+    nav button {
+      background-color: #f8f8f8;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    nav button:hover {
+      background-color: #e8e8e8;
+    }
+    nav span {
+      margin: 0 10px;
+      font-weight: bold;
+    }
     .container {
       display: flex;
       flex-direction: column;
@@ -84,6 +104,7 @@
   </style>
 </head>
 <body>
+  {% include 'header.html' %}
   {% block content %}{% endblock %}
   <script>
     function showPopup(title, price) {
