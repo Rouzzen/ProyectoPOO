@@ -107,9 +107,15 @@
   {% include 'header.html' %}
   {% block content %}{% endblock %}
   <script>
-    function showPopup(title, price) {
+    function showPopup(title, productos, ofertas, estado, nombreVendedor, telefono, datosTransferencia) {
+      var priceText = `Productos: ${productos}\nOfertas: ${ofertas}\nEstado: ${estado}`;
+      var detailsText = `\n\nNombre del vendedor: ${nombreVendedor}\nTeléfono: ${telefono}\nDatos de transferencia: ${datosTransferencia}`;
+      var fullText = priceText + detailsText;
+      
       document.getElementById('popupTitle').innerText = title;
-      document.getElementById('popupPrice').innerText = price;
+      document.getElementById('popupPrice').innerText = priceText;
+      document.getElementById('popupDetails').innerText = detailsText;  
+      document.getElementById('popupSeparator').style.borderBottom = "1px solid black";  
       document.getElementById('myPopup').style.display = "block";
     }
 

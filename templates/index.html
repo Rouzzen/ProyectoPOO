@@ -5,22 +5,28 @@
   <h1 class="title">Puestos activos</h1>
   <div class="row">
     {% for puesto in puestos_activos %}
-    <div class="card" onclick="showPopup('{{ puesto.titulo }}', '${{ puesto.precio }}')">
-      <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
-      <p>{{ puesto.titulo }}</p>
-      <p>${{ puesto.precio }}</p>
-    </div>
+      {% for usuario in usuarios %}
+        {% if puesto[0] == usuario[0] %}
+          <div class="card" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
+            <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
+            <p>{{ puesto[1] }}</p>
+          </div>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
   </div>
 
   <h1 class="title">Puestos inactivos</h1>
   <div class="row">
     {% for puesto in puestos_inactivos %}
-    <div class="card inactive" onclick="showPopup('{{ puesto.titulo }}', 'Inactivo')">
-      <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
-      <p>{{ puesto.titulo }}</p>
-      <p>Inactivo</p>
+    {% for usuario in usuarios %}
+        {% if puesto[0] == usuario[0] %}
+          <div class="card inactive" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
+        <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
+        <p>{{ puesto[1] }}</p>
     </div>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
   </div>
 </div>
@@ -31,6 +37,8 @@
     <span class="close" onclick="closePopup()">&times;</span>
     <h2 id="popupTitle"></h2>
     <p id="popupPrice"></p>
+    <div id="popupSeparator" style="margin-top: 5px;margin-bottom: 5px;"></div> 
+    <p id="popupDetails"></p>  
   </div>
 </div>
 {% endblock %}

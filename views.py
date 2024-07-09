@@ -6,22 +6,19 @@ views = Blueprint("views", __name__)
 @views.route("/")
 def home():
     cur = mysql.connection.cursor()
+
     cur.execute("SELECT * FROM puesto WHERE estado = 'activo'")
     puestos_activos = cur.fetchall()
 
     cur.execute("SELECT * FROM puesto WHERE estado = 'inactivo'")
     puestos_inactivos = cur.fetchall()
+    
+    cur.execute("SELECT * FROM usuario")
+    usuarios = cur.fetchall()
 
     cur.close()
+    return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos, usuarios=usuarios)
 
-    return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos)
-
-@views.route('/add', methods=['POST'])
-def add_puesto():
-    title = request.form.get('title')
-    price = request.form.get('price')
-    image_url = request.form.get('image_url')
-    return render_template('index.html', title=title, price=price, image_url=image_url)
 
 @views.route("/usuario", methods=['GET', 'POST'])
 def usuario():
