@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Ver Perfil{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="title">Tu Perfil</h1>
+  <div class="card">
+    <p><strong>Nombre:</strong> {{ usuario[3] }}</p>
+    <p><strong>WhatsApp:</strong> {{ usuario[4] }}</p>
+    <p><strong>Datos Bancarios:</strong> {{ usuario[5] }}</p>
+    
+    <!-- Botón para activar la edición -->
+    <button onclick="toggleEdit()" class="button">Editar</button>
+    
+    <!-- Formulario para editar el perfil -->
+    <form id="editForm" action="{{ url_for('views.ver_perfil') }}" method="POST" style="display: none;">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" value="{{ usuario[3] }}">
+      <label for="wsp">WhatsApp:</label>
+      <input type="text" id="wsp" name="wsp" value="{{ usuario[4] }}">
+      <label for="datos">Datos Bancarios:</label>
+      <textarea id="datos" name="datos">{{ usuario[5] }}</textarea>
+      <button type="submit" class="button">Guardar cambios</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleEdit() {
+    var editForm = document.getElementById('editForm');
+    if (editForm.style.display === 'none') {
+      editForm.style.display = 'block';
+    } else {
+      editForm.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}

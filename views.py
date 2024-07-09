@@ -181,3 +181,29 @@ def borrar_puesto(puesto_id):
     cur.close()
 
     return redirect(url_for('views.home'))
+
+@views.route("/ver_perfil", methods=['GET', 'POST'])
+def ver_perfil():
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+    
+    user_id = session['user_id']
+    
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        wsp = request.form['wsp']
+        datos = request.form['datos']
+        
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE usuario SET nombre=%s, wsp=%s, datos=%s WHERE id=%s", (nombre, wsp, datos, user_id))
+        mysql.connection.commit()
+        cur.close()
+        
+        return redirect(url_for('views.ver_perfil'))
+    
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM usuario WHERE id = %s", (user_id,))
+    usuario = cur.fetchone()
+    cur.close()
+    
+    return render_template("ver_perfil.html", usuario=usuario)
