@@ -19,9 +19,15 @@ def home():
     cur.execute("SELECT * FROM usuario")
     usuarios = cur.fetchall()
 
-    cur.close()
-    return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos, usuarios=usuarios)
+    user_id = session.get('user_id')
+    user_has_puesto = False
 
+    if user_id:
+        cur.execute("SELECT 1 FROM puesto WHERE id_p = %s LIMIT 1", (user_id,))
+        user_has_puesto = cur.fetchone() is not None
+
+    cur.close()
+    return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos, usuarios=usuarios, user_has_puesto=user_has_puesto)
 
 @views.route("/usuario", methods=['GET', 'POST'])
 def usuario():
@@ -59,6 +65,7 @@ def login():
         return 'Usuario o clave incorrecta', 401
     
     return render_template("login.html")
+
 @views.route("/logout")
 def logout():
     session.pop('user_id', None)
@@ -94,3 +101,83 @@ def agregar_puesto():
             return "Debe iniciar sesión para crear un puesto."
     
     return render_template("puesto.html")
+
+@views.route("/ver_puesto")
+def ver_puesto():
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
+    user_id = session['user_id']
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT * FROM puesto WHERE id_p = %s", (user_id,))
+    puesto = cur.fetchone()
+
+    cur.close()
+    return render_template("ver_puesto.html", puesto=puesto)
+
+
+@views.route("/editar_puesto/<int:puesto_id>", methods=['POST'])
+def editar_puesto(puesto_id):
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
+    titulo = request.form['titulo']
+    productos = request.form['productos']
+    ofertas = request.form['ofertas']
+
+    imagen_path = None
+    if 'imagen' in request.files:
+        imagen = request.files['imagen']
+        if imagen.filename != '':
+            filename = secure_filename(imagen.filename)
+            imagen_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            imagen.save(imagen_path)
+            imagen_path = os.path.join('static', filename)
+
+    cur = mysql.connection.cursor()
+    if imagen_path:
+        cur.execute("""
+            UPDATE puesto 
+            SET titulo = %s, productos = %s, ofertas = %s, imagen = %s
+            WHERE id_p = %s
+        """, (titulo, productos, ofertas, imagen_path, puesto_id))
+    else:
+        cur.execute("""
+            UPDATE puesto 
+            SET titulo = %s, productos = %s, ofertas = %s
+            WHERE id_p = %s
+        """, (titulo, productos, ofertas, puesto_id))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('views.ver_puesto'))
+
+
+@views.route("/toggle_estado/<int:puesto_id>", methods=['POST'])
+def toggle_estado(puesto_id):
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT estado FROM puesto WHERE id_p = %s", (puesto_id,))
+    estado_actual = cur.fetchone()[0]
+
+    nuevo_estado = 'inactivo' if estado_actual == 'activo' else 'activo'
+    cur.execute("UPDATE puesto SET estado = %s WHERE id_p = %s", (nuevo_estado, puesto_id))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('views.ver_puesto'))
+
+@views.route("/borrar_puesto/<int:puesto_id>", methods=['POST'])
+def borrar_puesto(puesto_id):
+    if 'user_id' not in session:
+        return redirect(url_for('views.login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM puesto WHERE id_p = %s", (puesto_id,))
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('views.home'))

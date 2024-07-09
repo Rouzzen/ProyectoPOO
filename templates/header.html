@@ -2,11 +2,16 @@
     <nav>
         <a href="{{ url_for('views.home') }}">Inicio</a>
         {% if 'username' in session %}
-          <span>Bienvenido, {{ session['username'] }}!</span>
-          <a href="{{ url_for('views.logout') }}">Cerrar sesión</a>
+            <span>Bienvenido, {{ session['username'] }}!</span>
+            <a href="{{ url_for('views.logout') }}">Cerrar sesión</a>
+            {% if user_has_puesto %}
+                <a href="{{ url_for('views.ver_puesto') }}">Ver tu puesto</a>
+            {% else %}
+                <a href="{{ url_for('views.agregar_puesto') }}">Crear un puesto</a>
+            {% endif %}
         {% else %}
-          <a href="{{ url_for('views.login') }}">Iniciar sesión</a>
-          <a href="{{ url_for('views.usuario') }}">Crear cuenta</a>
+            <a href="{{ url_for('views.login') }}">Iniciar sesión</a>
+            <a href="{{ url_for('views.usuario') }}">Crear cuenta</a>
         {% endif %}
-      </nav>
+    </nav>
 </html>

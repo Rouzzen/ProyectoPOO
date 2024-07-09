@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Ver Puesto{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="title">Tu Puesto</h1>
+  <div class="card">
+    {% if puesto[4] %}
+      <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+    {% endif %}
+    <p><strong>Título:</strong> {{ puesto[1] }}</p>
+    <p><strong>Productos:</strong> {{ puesto[2] }}</p>
+    <p><strong>Ofertas:</strong> {{ puesto[3] }}</p>
+    <p><strong>Estado:</strong> {{ puesto[5] }}</p>
+    
+    <!-- Botón para activar la edición -->
+    <button onclick="toggleEdit()" class="button">Editar</button>
+    
+    <!-- Formulario para editar el puesto -->
+    <form id="editForm" action="{{ url_for('views.editar_puesto', puesto_id=puesto[0]) }}" method="POST" enctype="multipart/form-data" style="display: none;">
+      <label for="titulo">Título:</label>
+      <input type="text" id="titulo" name="titulo" value="{{ puesto[1] }}">
+      <label for="productos">Productos:</label>
+      <textarea id="productos" name="productos">{{ puesto[2] }}</textarea>
+      <label for="ofertas">Ofertas:</label>
+      <textarea id="ofertas" name="ofertas">{{ puesto[3] }}</textarea>
+      <label for="imagen">Imagen:</label>
+      <input type="file" id="imagen" name="imagen">
+      <button type="submit" class="button">Guardar cambios</button>
+    </form>
+    
+    <!-- Formulario para cambiar el estado -->
+    <form action="{{ url_for('views.toggle_estado', puesto_id=puesto[0]) }}" method="POST">
+      <button type="submit" class="button">
+        {% if puesto[5] == 'activo' %}
+          Desactivar
+        {% else %}
+          Activar
+        {% endif %}
+      </button>
+    </form>
+    
+    <!-- Botón para eliminar el puesto -->
+    <form action="{{ url_for('views.borrar_puesto', puesto_id=puesto[0]) }}" method="POST">
+      <button type="submit" class="button" style="background-color: red;">Eliminar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleEdit() {
+    var editForm = document.getElementById('editForm');
+    if (editForm.style.display === 'none') {
+      editForm.style.display = 'block';
+    } else {
+      editForm.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}
