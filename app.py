@@ -2,6 +2,8 @@ from flask import Flask
 from views import views
 import os
 from db import mysql
+import webbrowser
+from threading import Timer
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -18,5 +20,9 @@ mysql.init_app(app)
 
 app.register_blueprint(views, url_prefix="/views")
 
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:8000/views")
+
 if __name__ == '__main__':
+    Timer(1, open_browser).start()
     app.run(debug=True, port=8000)
