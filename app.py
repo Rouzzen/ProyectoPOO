@@ -11,6 +11,9 @@ app.config['MYSQL_USER'] = "root"
 app.config['MYSQL_PASSWORD'] = ""
 app.config['MYSQL_DB'] = "proyecto"
 
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 mysql.init_app(app)
 
 app.register_blueprint(views, url_prefix="/views")

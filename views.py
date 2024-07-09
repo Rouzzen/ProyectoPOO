@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import mysql  # Importa mysql desde db.py
+from werkzeug.utils import secure_filename
+from flask import current_app
+import os
 
 views = Blueprint("views", __name__)
 
@@ -66,21 +69,23 @@ def logout():
 def agregar_puesto():
     if request.method == 'POST':
         if 'username' in session:
-            usuario_id = session['user_id'] 
+            usuario_id = session['user_id']
             titulo = request.form['titulo']
             productos = request.form['productos']
-            ofertas = request.form.get('ofertas', '') 
-            estado = 'inactivo'  
+            ofertas = request.form.get('ofertas', '')
+            estado = 'inactivo'
             
-            
+            imagen_path = None
             if 'imagen' in request.files:
                 imagen = request.files['imagen']
-                
-            
+                if imagen.filename != '':
+                    filename = secure_filename(imagen.filename)
+                    imagen_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    imagen.save(imagen_path)
             
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO puesto (id, titulo, productos, ofertas, estado) VALUES (%s, %s, %s, %s, %s)",
-                        (usuario_id, titulo, productos, ofertas, estado))
+            cur.execute("INSERT INTO puesto (id_p, titulo, productos, ofertas, estado, imagen) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (usuario_id, titulo, productos, ofertas, estado, imagen_path))
             mysql.connection.commit()
             cur.close()
             

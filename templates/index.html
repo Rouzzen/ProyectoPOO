@@ -8,7 +8,9 @@
       {% for usuario in usuarios %}
         {% if puesto[0] == usuario[0] %}
           <div class="card" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
-            <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
+            {% if puesto[4] %}
+              <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+            {% endif %}
             <p>{{ puesto[1] }}</p>
           </div>
         {% endif %}
@@ -19,12 +21,14 @@
   <h1 class="title">Puestos inactivos</h1>
   <div class="row">
     {% for puesto in puestos_inactivos %}
-    {% for usuario in usuarios %}
+      {% for usuario in usuarios %}
         {% if puesto[0] == usuario[0] %}
           <div class="card inactive" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
-        <img src="{{ puesto.imagen_url }}" alt="{{ puesto.titulo }}">
-        <p>{{ puesto[1] }}</p>
-    </div>
+            {% if puesto[4] %}
+                <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+              {% endif %}
+            <p>{{ puesto[1] }}</p>
+          </div>
         {% endif %}
       {% endfor %}
     {% endfor %}
