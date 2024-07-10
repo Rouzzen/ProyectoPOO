@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-07-2024 a las 00:07:30
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Tiempo de generación: 10-07-2024 a las 02:49:22
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -46,7 +46,8 @@ INSERT INTO `puesto` (`id_p`, `titulo`, `productos`, `ofertas`, `imagen`, `estad
 (5, 'Puesto pines', 'Pines varios', '1500 c/u', 'static/uploads\\imagen_2024-07-09_180124180.png', 'inactivo'),
 (6, 'Puesto rockets', 'Rockets, conitos y energética', 'no', 'static/uploads\\imagen_2024-07-09_180252836.png', 'activo'),
 (7, 'Puesto Scores', 'Score', '$1100 c/u', 'static/uploads\\imagen_2024-07-09_180429570.png', 'activo'),
-(8, 'Puesto Alfajores', 'Alfajores a 500', 'no', 'static/uploads\\imagen_2024-07-09_180608856.png', 'inactivo');
+(8, 'Puesto Alfajores', 'Alfajores a 500', 'no', 'static/uploads\\imagen_2024-07-09_180608856.png', 'inactivo'),
+(9, 'Onigiris', 'Onigiris a $1000 c/u\r\n>Pollo Teriyaki\r\n>Champiñón Soja', '4 x $3000', 'static/uploads\\onigiri.jpg', 'activo');
 
 -- --------------------------------------------------------
 
@@ -75,7 +76,8 @@ INSERT INTO `usuario` (`id`, `usuario`, `clave`, `nombre`, `wsp`, `datos`) VALUE
 (5, 'pin', '12', 'Daniel', '+56987389804', 'Banco estado, cuenta rut 1284892'),
 (6, 'rocket', '12', 'Claudio', '+56981935299', 'Cuenta santander ...'),
 (7, 'Score', '12', 'Lucas', '985636798', 'Cuenta BCi/mach 8213710'),
-(8, 'alfa', '12', 'Sofia', '+56994320751', 'Cuenta rut N219249028');
+(8, 'alfa', '12', 'Sofia', '+56994320751', 'Cuenta rut N219249028'),
+(9, 'Don Pulpo', '1234', 'Andrés Huiliñir', '64497064', 'BancoEstado');
 
 --
 -- Índices para tablas volcadas
@@ -95,7 +97,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
