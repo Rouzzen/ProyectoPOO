@@ -3,7 +3,7 @@ from db import mysql  # Importa mysql desde db.py
 from werkzeug.utils import secure_filename
 from flask import current_app
 import os
-from puesto import Puesto
+from puesto import  Puesto
 from usuario import Usuario
 
 views = Blueprint("views", __name__)
@@ -11,17 +11,45 @@ views = Blueprint("views", __name__)
 def check_user_has_puesto():
     user_id = session.get('user_id')
     if user_id:
-        return Puesto.get_by_id(mysql, user_id) is not None
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT 1 FROM puesto WHERE id_p = %s LIMIT 1", (user_id,))
+        user_has_puesto = cur.fetchone() is not None
+        cur.close()
+        return user_has_puesto
     return False
 
 @views.route("/")
 def home():
-    puestos_activos = Puesto.get_all_puestos_by_estado(mysql, 'activo')
-    puestos_inactivos = Puesto.get_all_puestos_by_estado(mysql, 'inactivo')
-    usuarios = Usuario.get_all(mysql)
+    puestos_activos = []
+    puestos_inactivos = []
+    
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id_p FROM puesto WHERE estado = 'activo'")
+    puestos_activos_ids = cur.fetchall()
+    cur.execute("SELECT id_p FROM puesto WHERE estado = 'inactivo'")
+    puestos_inactivos_ids = cur.fetchall()
+    cur.close()
+
+    for id_p in puestos_activos_ids:
+        puesto = Puesto.obtener_por_id(id_p[0], mysql)
+        puestos_activos.append(puesto)
+
+    for id_p in puestos_inactivos_ids:
+        puesto = Puesto.obtener_por_id(id_p[0], mysql)
+        puestos_inactivos.append(puesto)
+
+    # Obtener todos los usuarios
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id FROM usuario")
+    usuarios_ids = cur.fetchall()
+    cur.close()
+
+    usuarios = [Usuario.obtener_por_id(id_u[0], mysql) for id_u in usuarios_ids]
+
     user_has_puesto = check_user_has_puesto()
 
     return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos, usuarios=usuarios, user_has_puesto=user_has_puesto)
+
 
 @views.route("/usuario", methods=['GET', 'POST'])
 def usuario():
@@ -32,9 +60,10 @@ def usuario():
         wsp = request.form.get('wsp')
         datos = request.form.get('datos')
 
-        usuario = Usuario(None, user, clave, nombre, wsp, datos)
-        usuario.save_to_db(mysql)
-
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO usuario (usuario, clave, nombre, wsp, datos) VALUES (%s, %s, %s, %s, %s)", (user, clave, nombre, wsp, datos))
+        mysql.connection.commit()
+        cur.close()
         flash('Cuenta creada con éxito')
         return redirect(url_for('views.login'))
     return render_template("usuario.html", user_has_puesto=check_user_has_puesto())
@@ -47,9 +76,9 @@ def login():
         username = request.form['username']
         password = request.form['clave']
         
-        cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM usuario WHERE usuario = %s AND clave = %s', (username, password))
-        user = cur.fetchone()
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM usuario WHERE usuario = %s AND clave = %s', (username, password))
+        user = cursor.fetchone()
         
         if user:
             session['user_id'] = user[0]
@@ -90,8 +119,11 @@ def agregar_puesto():
                 imagen_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 imagen.save(imagen_path)
         
-        puesto = Puesto(usuario_id, titulo, productos, ofertas, imagen_path, estado)
-        puesto.save_to_db(mysql)
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO puesto (id_p, titulo, productos, ofertas, estado, imagen) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (usuario_id, titulo, productos, ofertas, estado, imagen_path))
+        mysql.connection.commit()
+        cur.close()
         
         return redirect(url_for('views.home'))
     
