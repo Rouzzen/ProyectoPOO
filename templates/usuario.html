@@ -1,10 +1,108 @@
-<h1>Crear Cuenta</h1>
-
-<form method="post" action="/views/usuario">
-    <input type="text" name="user" placeholder="nombre de usuario" required>
-    <input type="password" name="clave" placeholder="clave"  required>
-    <input type="text" name="nombre" placeholder="Nombre"  required>
-    <input type="text" name="wsp" placeholder="telefono +569" required>
-    <input type="text" name="datos bancarios" placeholder="datos de transferencia" required>
-    <input type="submit">
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear cuenta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url("{{ url_for('static', filename='uploads/background.png') }}");
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh; /* Limitar la altura máxima del contenedor */
+            overflow-y: auto; /* Hacer que el contenido sea desplazable */
+        }
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #218838;
+        }
+        .button-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        .button-secondary:hover {
+            background-color: #5a6268;
+        }
+        .title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="title">Crear cuenta</h2>
+        <form method="POST" action="/views/usuario">
+            <div class="form-group">
+                <label for="user">Usuario</label>
+                <input type="text" id="user" name="user" class="form-control" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="clave">Contraseña</label>
+                <input type="password" id="clave" name="clave" class="form-control" placeholder="Contraseña" required>
+            </div>
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="wsp">WhatsApp</label>
+                <input type="text" id="wsp" name="wsp" class="form-control" placeholder="WhatsApp">
+            </div>
+            <div class="form-group">
+                <label for="datos">Datos bancarios</label>
+                <input type="text" id="datos" name="datos" class="form-control" placeholder="Datos bancarios">
+            </div>
+            <button type="submit" class="button">Crear cuenta</button>
+            <a href="{{ url_for('views.home') }}" class="button-secondary">Volver al Home</a>
+        </form>
+        <p>¿Ya tienes una cuenta? <a href="{{ url_for('views.login') }}" class="link">Inicia sesión</a></p>
+    </div>
+</body>
+</html>
