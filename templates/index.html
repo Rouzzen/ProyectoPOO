@@ -25,8 +25,8 @@
         {% if puesto[0] == usuario[0] %}
           <div class="card inactive" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
             {% if puesto[4] %}
-                <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
-              {% endif %}
+              <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+            {% endif %}
             <p>{{ puesto[1] }}</p>
           </div>
         {% endif %}

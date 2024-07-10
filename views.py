@@ -50,6 +50,7 @@ def usuario():
     
     return render_template("usuario.html")
 
+
 @views.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -107,6 +108,7 @@ def agregar_puesto():
             return "Debe iniciar sesión para crear un puesto."
     
     return render_template("puesto.html")
+
 
 @views.route("/ver_puesto")
 def ver_puesto():
