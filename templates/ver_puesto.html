@@ -45,6 +45,9 @@
     <form action="{{ url_for('views.borrar_puesto', puesto_id=puesto[0]) }}" method="POST">
       <button type="submit" class="button" style="background-color: red;">Eliminar</button>
     </form>
+    
+    <!-- Botón para volver al home -->
+    <a href="{{ url_for('views.home') }}" class="button">Volver al Home</a>
   </div>
 </div>
 
@@ -58,4 +61,7 @@
     }
   }
 </script>
+{% endblock %}
+
+{% block header %}
 {% endblock %}

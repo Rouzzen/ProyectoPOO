@@ -23,6 +23,9 @@
       <textarea id="datos" name="datos">{{ usuario[5] }}</textarea>
       <button type="submit" class="button">Guardar cambios</button>
     </form>
+
+    <!-- Botón para volver al home -->
+    <a href="{{ url_for('views.home') }}" class="button">Volver al Home</a>
   </div>
 </div>
 
@@ -36,4 +39,7 @@
     }
   }
 </script>
+{% endblock %}
+
+{% block header %}
 {% endblock %}
