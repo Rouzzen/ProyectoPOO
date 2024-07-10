@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import mysql  # Importa mysql desde db.py
 from werkzeug.utils import secure_filename
+from flask import redirect, url_for
 from flask import current_app
 import os
 
@@ -39,11 +40,16 @@ def usuario():
         datos = request.form['datos bancarios']
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO usuario (usuario, clave, nombre, wsp, datos) VALUES (%s, %s, %s, %s, %s)", (user, clave, nombre, wsp, datos))
+        cur.execute("INSERT INTO usuario (usuario, clave, nombre, wsp, datos) VALUES (%s, %s, %s, %s, %s)", 
+                    (user, clave, nombre, wsp, datos))
         mysql.connection.commit()
         cur.close()
-        return "success"
+        
+        # Redirigir al home después de crear el usuario
+        return redirect(url_for('views.home'))
+    
     return render_template("usuario.html")
+
 
 @views.route("/login", methods=['GET', 'POST'])
 def login():
@@ -75,7 +81,7 @@ def logout():
 @views.route("/puesto", methods=['GET', 'POST'])
 def agregar_puesto():
     if request.method == 'POST':
-        if 'username' in session:
+        if 'user_id' in session:
             usuario_id = session['user_id']
             titulo = request.form['titulo']
             productos = request.form['productos']
@@ -96,11 +102,13 @@ def agregar_puesto():
             mysql.connection.commit()
             cur.close()
             
-            return "Puesto creado correctamente."
+            # Redirigir al home después de crear el puesto
+            return redirect(url_for('views.home'))
         else:
             return "Debe iniciar sesión para crear un puesto."
     
     return render_template("puesto.html")
+
 
 @views.route("/ver_puesto")
 def ver_puesto():
