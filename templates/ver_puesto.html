@@ -6,34 +6,34 @@
 <div class="container">
   <h1 class="title">Tu Puesto</h1>
   <div class="card">
-    {% if puesto[4] %}
-      <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+    {% if puesto.imagen %}
+      <img src="{{ url_for('static', filename=puesto.imagen.replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto.titulo }}">
     {% endif %}
-    <p><strong>Título:</strong> {{ puesto[1] }}</p>
-    <p><strong>Productos:</strong> {{ puesto[2] }}</p>
-    <p><strong>Ofertas:</strong> {{ puesto[3] }}</p>
-    <p><strong>Estado:</strong> {{ puesto[5] }}</p>
+    <p><strong>Título:</strong> {{ puesto.titulo }}</p>
+    <p><strong>Productos:</strong> {{ puesto.productos }}</p>
+    <p><strong>Ofertas:</strong> {{ puesto.ofertas }}</p>
+    <p><strong>Estado:</strong> {{ puesto.estado }}</p>
     
     <!-- Botón para activar la edición -->
     <button onclick="toggleEdit()" class="button">Editar</button>
     
     <!-- Formulario para editar el puesto -->
-    <form id="editForm" action="{{ url_for('views.editar_puesto', puesto_id=puesto[0]) }}" method="POST" enctype="multipart/form-data" style="display: none;">
+    <form id="editForm" action="{{ url_for('views.editar_puesto', puesto_id=puesto.id_p) }}" method="POST" enctype="multipart/form-data" style="display: none;">
       <label for="titulo">Título:</label>
-      <input type="text" id="titulo" name="titulo" value="{{ puesto[1] }}">
+      <input type="text" id="titulo" name="titulo" value="{{ puesto.titulo }}">
       <label for="productos">Productos:</label>
-      <textarea id="productos" name="productos">{{ puesto[2] }}</textarea>
+      <textarea id="productos" name="productos">{{ puesto.productos }}</textarea>
       <label for="ofertas">Ofertas:</label>
-      <textarea id="ofertas" name="ofertas">{{ puesto[3] }}</textarea>
+      <textarea id="ofertas" name="ofertas">{{ puesto.ofertas }}</textarea>
       <label for="imagen">Imagen:</label>
       <input type="file" id="imagen" name="imagen">
       <button type="submit" class="button">Guardar cambios</button>
     </form>
     
     <!-- Formulario para cambiar el estado -->
-    <form action="{{ url_for('views.toggle_estado', puesto_id=puesto[0]) }}" method="POST">
+    <form action="{{ url_for('views.toggle_estado', puesto_id=puesto.id_p) }}" method="POST">
       <button type="submit" class="button">
-        {% if puesto[5] == 'activo' %}
+        {% if puesto.estado == 'activo' %}
           Desactivar
         {% else %}
           Activar
@@ -42,7 +42,7 @@
     </form>
     
     <!-- Botón para eliminar el puesto -->
-    <form action="{{ url_for('views.borrar_puesto', puesto_id=puesto[0]) }}" method="POST">
+    <form action="{{ url_for('views.borrar_puesto', puesto_id=puesto.id_p) }}" method="POST">
       <button type="submit" class="button" style="background-color: red;">Eliminar</button>
     </form>
     

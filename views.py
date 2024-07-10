@@ -3,35 +3,24 @@ from db import mysql  # Importa mysql desde db.py
 from werkzeug.utils import secure_filename
 from flask import current_app
 import os
+from puesto import Puesto
+from usuario import Usuario
 
 views = Blueprint("views", __name__)
 
 def check_user_has_puesto():
     user_id = session.get('user_id')
     if user_id:
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT 1 FROM puesto WHERE id_p = %s LIMIT 1", (user_id,))
-        user_has_puesto = cur.fetchone() is not None
-        cur.close()
-        return user_has_puesto
+        return Puesto.get_by_id(mysql, user_id) is not None
     return False
 
 @views.route("/")
 def home():
-    cur = mysql.connection.cursor()
-
-    cur.execute("SELECT * FROM puesto WHERE estado = 'activo'")
-    puestos_activos = cur.fetchall()
-
-    cur.execute("SELECT * FROM puesto WHERE estado = 'inactivo'")
-    puestos_inactivos = cur.fetchall()
-    
-    cur.execute("SELECT * FROM usuario")
-    usuarios = cur.fetchall()
-
+    puestos_activos = Puesto.get_all_puestos_by_estado(mysql, 'activo')
+    puestos_inactivos = Puesto.get_all_puestos_by_estado(mysql, 'inactivo')
+    usuarios = Usuario.get_all(mysql)
     user_has_puesto = check_user_has_puesto()
 
-    cur.close()
     return render_template("index.html", puestos_activos=puestos_activos, puestos_inactivos=puestos_inactivos, usuarios=usuarios, user_has_puesto=user_has_puesto)
 
 @views.route("/usuario", methods=['GET', 'POST'])
@@ -43,10 +32,9 @@ def usuario():
         wsp = request.form.get('wsp')
         datos = request.form.get('datos')
 
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO usuario (usuario, clave, nombre, wsp, datos) VALUES (%s, %s, %s, %s, %s)", (user, clave, nombre, wsp, datos))
-        mysql.connection.commit()
-        cur.close()
+        usuario = Usuario(None, user, clave, nombre, wsp, datos)
+        usuario.save_to_db(mysql)
+
         flash('Cuenta creada con éxito')
         return redirect(url_for('views.login'))
     return render_template("usuario.html", user_has_puesto=check_user_has_puesto())
@@ -59,9 +47,9 @@ def login():
         username = request.form['username']
         password = request.form['clave']
         
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM usuario WHERE usuario = %s AND clave = %s', (username, password))
-        user = cursor.fetchone()
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM usuario WHERE usuario = %s AND clave = %s', (username, password))
+        user = cur.fetchone()
         
         if user:
             session['user_id'] = user[0]
@@ -102,11 +90,8 @@ def agregar_puesto():
                 imagen_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 imagen.save(imagen_path)
         
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO puesto (id_p, titulo, productos, ofertas, estado, imagen) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (usuario_id, titulo, productos, ofertas, estado, imagen_path))
-        mysql.connection.commit()
-        cur.close()
+        puesto = Puesto(usuario_id, titulo, productos, ofertas, imagen_path, estado)
+        puesto.save_to_db(mysql)
         
         return redirect(url_for('views.home'))
     
@@ -118,12 +103,8 @@ def ver_puesto():
         return redirect(url_for('views.login'))
 
     user_id = session['user_id']
-    cur = mysql.connection.cursor()
+    puesto = Puesto.get_by_id(mysql, user_id)
 
-    cur.execute("SELECT * FROM puesto WHERE id_p = %s", (user_id,))
-    puesto = cur.fetchone()
-
-    cur.close()
     return render_template("ver_puesto.html", puesto=puesto, user_has_puesto=check_user_has_puesto())
 
 @views.route("/editar_puesto/<int:puesto_id>", methods=['POST'])
@@ -144,21 +125,14 @@ def editar_puesto(puesto_id):
             imagen.save(imagen_path)
             imagen_path = os.path.join('static', filename)
 
-    cur = mysql.connection.cursor()
-    if imagen_path:
-        cur.execute("""
-            UPDATE puesto 
-            SET titulo = %s, productos = %s, ofertas = %s, imagen = %s
-            WHERE id_p = %s
-        """, (titulo, productos, ofertas, imagen_path, puesto_id))
-    else:
-        cur.execute("""
-            UPDATE puesto 
-            SET titulo = %s, productos = %s, ofertas = %s
-            WHERE id_p = %s
-        """, (titulo, productos, ofertas, puesto_id))
-    mysql.connection.commit()
-    cur.close()
+    puesto = Puesto.get_by_id(mysql, puesto_id)
+    if puesto:
+        puesto.titulo = titulo
+        puesto.productos = productos
+        puesto.ofertas = ofertas
+        if imagen_path:
+            puesto.imagen = imagen_path
+        puesto.update_in_db(mysql)
 
     return redirect(url_for('views.ver_puesto'))
 
@@ -167,14 +141,10 @@ def toggle_estado(puesto_id):
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
 
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT estado FROM puesto WHERE id_p = %s", (puesto_id,))
-    estado_actual = cur.fetchone()[0]
-
-    nuevo_estado = 'inactivo' if estado_actual == 'activo' else 'activo'
-    cur.execute("UPDATE puesto SET estado = %s WHERE id_p = %s", (nuevo_estado, puesto_id))
-    mysql.connection.commit()
-    cur.close()
+    puesto = Puesto.get_by_id(mysql, puesto_id)
+    if puesto:
+        puesto.estado = 'inactivo' if puesto.estado == 'activo' else 'activo'
+        puesto.update_in_db(mysql)
 
     return redirect(url_for('views.ver_puesto'))
 
@@ -202,16 +172,15 @@ def ver_perfil():
         wsp = request.form['wsp']
         datos = request.form['datos']
         
-        cur = mysql.connection.cursor()
-        cur.execute("UPDATE usuario SET nombre=%s, wsp=%s, datos=%s WHERE id=%s", (nombre, wsp, datos, user_id))
-        mysql.connection.commit()
-        cur.close()
+        usuario = Usuario.get_by_id(mysql, user_id)
+        if usuario:
+            usuario.nombre = nombre
+            usuario.wsp = wsp
+            usuario.datos = datos
+            usuario.update_in_db(mysql)
         
         return redirect(url_for('views.ver_perfil'))
     
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM usuario WHERE id = %s", (user_id,))
-    usuario = cur.fetchone()
-    cur.close()
+    usuario = Usuario.get_by_id(mysql, user_id)
     
     return render_template("ver_perfil.html", usuario=usuario, user_has_puesto=check_user_has_puesto())

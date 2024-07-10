@@ -1,43 +1,41 @@
-import Estado as estado
 class Puesto:
-    def __init__(self,ID,Titulo,Productos,Ofertas,Imagen,Estado):
-        self.ID = ID
-        self.Titulo = Titulo
-        self.Productos = Productos
-        self.Ofertas = Ofertas
-        self.Imagen = Imagen
-        self.Estado = Estado
+    def __init__(self, id_p, titulo, productos, ofertas, imagen, estado):
+        self.id_p = id_p
+        self.titulo = titulo
+        self.productos = productos
+        self.ofertas = ofertas
+        self.imagen = imagen
+        self.estado = estado
 
-# Que puede hacer un puesto? editar su informacion 
-# Que informacion necesitaria editar? Todo puede cambiar
+    @staticmethod
+    def get_all_puestos_by_estado(mysql, estado):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM puesto WHERE estado = %s", (estado,))
+        rows = cur.fetchall()
+        cur.close()
+        return [Puesto(*row) for row in rows]
 
-    def EditarPuesto(self,ID,Titulo,Productos,Ofertas,Imagen,Estado):
-        if(ID == True):
-            self.ID = ID
-        if(Titulo == True):
-            self.Titulo = Titulo
-        if(Productos == True):
-            self.Productos = Productos
-        if(Ofertas == True):
-            self.Ofertas = Ofertas
-        if(Imagen == True):
-            self.Imagen = Imagen
-        if(Estado == True):
-            self.Estado = Estado
-        #en cada if colocar su query correspondiente
+    @staticmethod
+    def get_by_id(mysql, id_p):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM puesto WHERE id_p = %s", (id_p,))
+        row = cur.fetchone()
+        cur.close()
+        return Puesto(*row) if row else None
 
-    def ActivarPuesto(self):
-        self.Estado = estado.ESTADO.Activo
-        #aca colocar query
+    def save_to_db(self, mysql):
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO puesto (id_p, titulo, productos, ofertas, estado, imagen) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (self.id_p, self.titulo, self.productos, self.ofertas, self.estado, self.imagen))
+        mysql.connection.commit()
+        cur.close()
 
-    def DesactivarPuesto(self):
-        self.Estado = estado.ESTADO.Inactivo
-        #aca colocar query
-
-    def __del__(self):
-        print("Puesto fuera")
-
-    def EliminarPuesto(self):
-
-        #editar en la BDD
-        print("Puesto eliminado")
+    def update_in_db(self, mysql):
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE puesto 
+            SET titulo = %s, productos = %s, ofertas = %s, imagen = %s, estado = %s
+            WHERE id_p = %s
+        """, (self.titulo, self.productos, self.ofertas, self.imagen, self.estado, self.id_p))
+        mysql.connection.commit()
+        cur.close()

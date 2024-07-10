@@ -6,12 +6,12 @@
   <div class="row">
     {% for puesto in puestos_activos %}
       {% for usuario in usuarios %}
-        {% if puesto[0] == usuario[0] %}
-          <div class="card" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
-            {% if puesto[4] %}
-              <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+        {% if puesto.id_p == usuario.id %}
+          <div class="card" onclick="showPopup('{{ puesto.titulo }}', '{{ puesto.productos }}', '{{ puesto.ofertas }}', '{{ puesto.estado }}', '{{ usuario.nombre }}', '{{ usuario.wsp }}', '{{ usuario.datos }}')">
+            {% if puesto.imagen %}
+              <img src="{{ url_for('static', filename=puesto.imagen.replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto.titulo }}">
             {% endif %}
-            <p>{{ puesto[1] }}</p>
+            <p>{{ puesto.titulo }}</p>
           </div>
         {% endif %}
       {% endfor %}
@@ -22,12 +22,12 @@
   <div class="row">
     {% for puesto in puestos_inactivos %}
       {% for usuario in usuarios %}
-        {% if puesto[0] == usuario[0] %}
-          <div class="card inactive" onclick="showPopup('{{ puesto[1] }}', '{{ puesto[2] }}', '{{ puesto[3] }}', '{{ puesto[5] }}', '{{ usuario[3] }}', '{{ usuario[4] }}', '{{ usuario[5] }}')">
-            {% if puesto[4] %}
-              <img src="{{ url_for('static', filename=puesto[4].replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto[1] }}">
+        {% if puesto.id_p == usuario.id %}
+          <div class="card inactive" onclick="showPopup('{{ puesto.titulo }}', '{{ puesto.productos }}', '{{ puesto.ofertas }}', '{{ puesto.estado }}', '{{ usuario.nombre }}', '{{ usuario.wsp }}', '{{ usuario.datos }}')">
+            {% if puesto.imagen %}
+              <img src="{{ url_for('static', filename=puesto.imagen.replace('static/', '').replace('\\', '/')) }}" alt="{{ puesto.titulo }}">
             {% endif %}
-            <p>{{ puesto[1] }}</p>
+            <p>{{ puesto.titulo }}</p>
           </div>
         {% endif %}
       {% endfor %}
