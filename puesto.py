@@ -7,35 +7,46 @@ class Puesto:
         self.imagen = imagen
         self.estado = estado
 
-    @staticmethod
-    def get_all_puestos_by_estado(mysql, estado):
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM puesto WHERE estado = %s", (estado,))
-        rows = cur.fetchall()
-        cur.close()
-        return [Puesto(*row) for row in rows]
-
-    @staticmethod
-    def get_by_id(mysql, id_p):
+    @classmethod
+    def obtener_por_id(cls, id_p, mysql):
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM puesto WHERE id_p = %s", (id_p,))
-        row = cur.fetchone()
+        puesto_data = cur.fetchone()
         cur.close()
-        return Puesto(*row) if row else None
+        if puesto_data:
+            return cls(*puesto_data)
+        return None
 
-    def save_to_db(self, mysql):
+    def actualizar_estado(self, nuevo_estado, mysql):
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO puesto (id_p, titulo, productos, ofertas, estado, imagen) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (self.id_p, self.titulo, self.productos, self.ofertas, self.estado, self.imagen))
+        cur.execute("UPDATE puesto SET estado = %s WHERE id_p = %s", (nuevo_estado, self.id_p))
         mysql.connection.commit()
         cur.close()
+        self.estado = nuevo_estado
 
-    def update_in_db(self, mysql):
+    def actualizar_detalles(self, titulo, productos, ofertas, mysql, imagen_path=None):
         cur = mysql.connection.cursor()
-        cur.execute("""
-            UPDATE puesto 
-            SET titulo = %s, productos = %s, ofertas = %s, imagen = %s, estado = %s
-            WHERE id_p = %s
-        """, (self.titulo, self.productos, self.ofertas, self.imagen, self.estado, self.id_p))
+        if imagen_path:
+            cur.execute("""
+                UPDATE puesto 
+                SET titulo = %s, productos = %s, ofertas = %s, imagen = %s
+                WHERE id_p = %s
+            """, (titulo, productos, ofertas, imagen_path, self.id_p))
+        else:
+            cur.execute("""
+                UPDATE puesto 
+                SET titulo = %s, productos = %s, ofertas = %s
+                WHERE id_p = %s
+            """, (titulo, productos, ofertas, self.id_p))
+        mysql.connection.commit()
+        cur.close()
+        self.titulo = titulo
+        self.productos = productos
+        self.ofertas = ofertas
+        self.imagen = imagen_path if imagen_path else self.imagen
+
+    def eliminar(self, mysql):
+        cur = mysql.connection.cursor()
+        cur.execute("DELETE FROM puesto WHERE id_p = %s", (self.id_p,))
         mysql.connection.commit()
         cur.close()

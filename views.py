@@ -103,7 +103,8 @@ def ver_puesto():
         return redirect(url_for('views.login'))
 
     user_id = session['user_id']
-    puesto = Puesto.get_by_id(mysql, user_id)
+    usuario = Usuario.obtener_por_id(user_id, mysql)
+    puesto = usuario.obtener_puesto(mysql)
 
     return render_template("ver_puesto.html", puesto=puesto, user_has_puesto=check_user_has_puesto())
 
@@ -125,14 +126,9 @@ def editar_puesto(puesto_id):
             imagen.save(imagen_path)
             imagen_path = os.path.join('static', filename)
 
-    puesto = Puesto.get_by_id(mysql, puesto_id)
-    if puesto:
-        puesto.titulo = titulo
-        puesto.productos = productos
-        puesto.ofertas = ofertas
-        if imagen_path:
-            puesto.imagen = imagen_path
-        puesto.update_in_db(mysql)
+    usuario = Usuario.obtener_por_id(session['user_id'], mysql)
+    puesto = usuario.obtener_puesto(mysql)
+    puesto.actualizar_detalles(titulo, productos, ofertas, mysql, imagen_path)
 
     return redirect(url_for('views.ver_puesto'))
 
@@ -141,10 +137,10 @@ def toggle_estado(puesto_id):
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
 
-    puesto = Puesto.get_by_id(mysql, puesto_id)
-    if puesto:
-        puesto.estado = 'inactivo' if puesto.estado == 'activo' else 'activo'
-        puesto.update_in_db(mysql)
+    usuario = Usuario.obtener_por_id(session['user_id'], mysql)
+    puesto = usuario.obtener_puesto(mysql)
+    nuevo_estado = 'inactivo' if puesto.estado == 'activo' else 'activo'
+    puesto.actualizar_estado(nuevo_estado, mysql)
 
     return redirect(url_for('views.ver_puesto'))
 
@@ -153,10 +149,9 @@ def borrar_puesto(puesto_id):
     if 'user_id' not in session:
         return redirect(url_for('views.login'))
 
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM puesto WHERE id_p = %s", (puesto_id,))
-    mysql.connection.commit()
-    cur.close()
+    usuario = Usuario.obtener_por_id(session['user_id'], mysql)
+    puesto = usuario.obtener_puesto(mysql)
+    puesto.eliminar(mysql)
 
     return redirect(url_for('views.home'))
 
@@ -166,21 +161,14 @@ def ver_perfil():
         return redirect(url_for('views.login'))
     
     user_id = session['user_id']
+    usuario = Usuario.obtener_por_id(user_id, mysql)
     
     if request.method == 'POST':
         nombre = request.form['nombre']
         wsp = request.form['wsp']
         datos = request.form['datos']
-        
-        usuario = Usuario.get_by_id(mysql, user_id)
-        if usuario:
-            usuario.nombre = nombre
-            usuario.wsp = wsp
-            usuario.datos = datos
-            usuario.update_in_db(mysql)
+        usuario.actualizar_perfil(nombre, wsp, datos, mysql)
         
         return redirect(url_for('views.ver_perfil'))
-    
-    usuario = Usuario.get_by_id(mysql, user_id)
-    
+
     return render_template("ver_perfil.html", usuario=usuario, user_has_puesto=check_user_has_puesto())
